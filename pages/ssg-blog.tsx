@@ -1,38 +1,25 @@
-const tempPosts = [
-    {
-        title: "The first ssg post",
-    },
-    {
-        title: "The second ssg post",
-    },
-];
-
-const fetchPosts = () =>
-    new Promise((resolve) => {
-        setTimeout(() => {
-            resolve(tempPosts);
-        }, 2000);
-    });
+import type { User } from "../types/types";
 
 // This function gets called at build time
 export async function getStaticProps() {
-    // Call an external API endpoint to get posts
-    const posts = await fetchPosts();
+    // Call an external API endpoint to get users
+    const res = await fetch("https://randomuser.me/api/?results=5");
+    const data: { results: { users: User[] } } = await res.json();
 
-    // By returning { props: { posts } }, the Blog component
-    // will receive `posts` as a prop at build time
+    // By returning { props: { users } }, the Blog component
+    // will receive `users` as a prop at build time
     return {
         props: {
-            posts,
+            users: data.results,
         },
     };
 }
 
-function Blog({ posts = tempPosts }: { posts: { title: string }[] }) {
+function Blog({ users }: { users: User[] }) {
     return (
         <ul>
-            {posts.map((post, index) => (
-                <li key={index}>{post.title}</li>
+            {users.map((user, index) => (
+                <li key={index}>{user.name.first}</li>
             ))}
         </ul>
     );
